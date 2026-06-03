@@ -16,43 +16,55 @@
       </div>
     </div>
 
-    <form class="login-card" (ngSubmit)="login()">
+    <form class="login-card" autocomplete="off" (ngSubmit)="login()">
       <div class="login-header">
         <h2>Bienvenido</h2>
         <p>Ingrese sus credenciales para continuar</p>
       </div>
 
+      @if (errorMessage) {
+        <p-message severity="error" [text]="errorMessage" />
+      }
+
       <div class="field">
         <label for="email">Email</label>
-        <span class="p-input-icon-left">
+        <span class="input-icon-wrapper">
           <i class="pi pi-envelope"></i>
           <input
             id="email"
             pInputText
             type="email"
-            name="email"
+            name="loginEmail"
             [(ngModel)]="email"
-            autocomplete="email"
+            [class.p-invalid]="isEmailInvalid()"
+            autocomplete="off"
+            placeholder="correo@ejemplo.com"
           />
         </span>
+
+        @if (isEmailInvalid()) {
+          <small class="field-error">El email es obligatorio.</small>
+        }
       </div>
 
       <div class="field">
         <label for="password">Contraseña</label>
         <p-password
           inputId="password"
-          name="password"
+          name="loginPassword"
           [(ngModel)]="password"
           [toggleMask]="true"
           [feedback]="false"
+          [inputStyleClass]="isPasswordInvalid() ? 'w-full p-invalid' : 'w-full'"
           styleClass="w-full"
-          inputStyleClass="w-full"
+          autocomplete="new-password"
+          placeholder="Ingrese su contraseña"
         />
-      </div>
 
-      @if (errorMessage) {
-        <p-message severity="error" [text]="errorMessage" />
-      }
+        @if (isPasswordInvalid()) {
+          <small class="field-error">La contraseña es obligatoria.</small>
+        }
+      </div>
 
       <p-button
         type="submit"

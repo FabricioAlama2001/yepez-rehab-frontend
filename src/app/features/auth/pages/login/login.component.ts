@@ -19,22 +19,24 @@ export class LoginComponent {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
 
-  email = 'admin@yepezrehab.com';
-  password = 'Admin123*';
+  email = '';
+  password = '';
   loading = false;
+  submitted = false;
   errorMessage = '';
 
   login(): void {
+    this.submitted = true;
     this.errorMessage = '';
 
-    if (!this.email || !this.password) {
+    if (!this.email.trim() || !this.password.trim()) {
       this.errorMessage = 'Ingrese email y contraseña.';
       return;
     }
 
     this.loading = true;
 
-    this.authService.login(this.email, this.password).subscribe({
+    this.authService.login(this.email.trim(), this.password.trim()).subscribe({
       next: () => {
         this.loading = false;
         this.router.navigate(['/dashboard']);
@@ -44,5 +46,13 @@ export class LoginComponent {
         this.errorMessage = 'Credenciales inválidas o backend no disponible.';
       }
     });
+  }
+
+  isEmailInvalid(): boolean {
+    return this.submitted && !this.email.trim();
+  }
+
+  isPasswordInvalid(): boolean {
+    return this.submitted && !this.password.trim();
   }
 }

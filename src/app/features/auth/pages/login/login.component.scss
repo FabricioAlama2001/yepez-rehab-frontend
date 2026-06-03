@@ -93,9 +93,28 @@
   color: #334155;
 }
 
-.p-input-icon-left,
-.p-input-icon-left input {
+.input-icon-wrapper {
+  position: relative;
+  display: block;
+}
+
+.input-icon-wrapper i {
+  position: absolute;
+  top: 50%;
+  left: 0.85rem;
+  z-index: 1;
+  color: #64748b;
+  transform: translateY(-50%);
+}
+
+.input-icon-wrapper input {
   width: 100%;
+  padding-left: 2.4rem;
+}
+
+.field-error {
+  color: #dc2626;
+  font-size: 0.8rem;
 }
 
 :host ::ng-deep .p-password {
@@ -105,6 +124,10 @@
 :host ::ng-deep .login-button {
   margin-top: 0.5rem;
   padding: 0.85rem 1rem;
+}
+
+:host ::ng-deep .p-invalid {
+  border-color: #dc2626;
 }
 
 .w-full {

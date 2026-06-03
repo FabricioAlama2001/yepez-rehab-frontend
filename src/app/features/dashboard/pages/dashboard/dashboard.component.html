@@ -1,19 +1,67 @@
 <h1 class="page-title">Dashboard</h1>
-<p class="page-subtitle">Resumen inicial del sistema interno de gestión de citas.</p>
+<p class="page-subtitle">Resumen del sistema interno de gestión de citas.</p>
 
-<div class="dashboard-grid">
-  @for (metric of metrics; track metric.title) {
+@if (errorMessage) {
+  <p-message severity="error" [text]="errorMessage" />
+}
+
+@if (loading) {
+  <div class="card loading-state">
+    <i class="pi pi-spin pi-spinner"></i>
+    <span>Cargando resumen...</span>
+  </div>
+} @else {
+  <div class="dashboard-grid">
     <p-card styleClass="metric-card">
       <div class="metric-content">
         <div>
-          <span>{{ metric.title }}</span>
-          <strong>{{ metric.value }}</strong>
+          <span>Pacientes registrados</span>
+          <strong>{{ totalPatients }}</strong>
         </div>
 
         <div class="metric-icon">
-          <i [class]="metric.icon"></i>
+          <i class="pi pi-users"></i>
         </div>
       </div>
     </p-card>
-  }
-</div>
+
+    <p-card styleClass="metric-card">
+      <div class="metric-content">
+        <div>
+          <span>Citas del día</span>
+          <strong>{{ todayAppointments }}</strong>
+        </div>
+
+        <div class="metric-icon">
+          <i class="pi pi-calendar-clock"></i>
+        </div>
+      </div>
+    </p-card>
+
+    <p-card styleClass="metric-card">
+      <div class="metric-content">
+        <div>
+          <span>Citas canceladas</span>
+          <strong>{{ cancelledAppointments }}</strong>
+        </div>
+
+        <div class="metric-icon danger">
+          <i class="pi pi-times-circle"></i>
+        </div>
+      </div>
+    </p-card>
+
+    <p-card styleClass="metric-card">
+      <div class="metric-content">
+        <div>
+          <span>Citas atendidas</span>
+          <strong>{{ attendedAppointments }}</strong>
+        </div>
+
+        <div class="metric-icon success">
+          <i class="pi pi-check-circle"></i>
+        </div>
+      </div>
+    </p-card>
+  </div>
+}

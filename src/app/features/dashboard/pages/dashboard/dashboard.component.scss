@@ -4,6 +4,19 @@
   gap: 1.25rem;
 }
 
+.loading-state {
+  min-height: 14rem;
+  display: grid;
+  place-items: center;
+  gap: 0.75rem;
+  color: var(--yrc-muted);
+}
+
+.loading-state i {
+  font-size: 2rem;
+  color: var(--yrc-primary);
+}
+
 :host ::ng-deep .metric-card {
   border: 0;
   border-radius: 1.25rem;
@@ -38,6 +51,16 @@
   color: var(--yrc-primary-dark);
   background: rgb(20 184 166 / 10%);
   font-size: 1.35rem;
+}
+
+.metric-icon.danger {
+  color: #b91c1c;
+  background: rgb(239 68 68 / 10%);
+}
+
+.metric-icon.success {
+  color: #047857;
+  background: rgb(16 185 129 / 10%);
 }
 
 @media (max-width: 1100px) {

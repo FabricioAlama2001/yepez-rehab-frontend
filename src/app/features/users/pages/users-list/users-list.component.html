@@ -1,2 +1,202 @@
-<h1>Usuarios</h1>
-<p>Gestión de usuarios internos y fisioterapeutas. Solo visible para ADMIN.</p>
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Usuarios</h1>
+    <p class="page-subtitle">
+      Gestión de usuarios internos del sistema.
+    </p>
+  </div>
+
+  <p-button
+    label="Nuevo usuario"
+    icon="pi pi-plus"
+    (onClick)="openCreateDialog()"
+  />
+</div>
+
+@if (successMessage) {
+  <p-message severity="success" [text]="successMessage" />
+}
+
+@if (pageErrorMessage) {
+  <p-message severity="error" [text]="pageErrorMessage" />
+}
+
+<div class="card users-card">
+  @if (loading) {
+    <div class="loading-state">
+      <i class="pi pi-spin pi-spinner"></i>
+      <span>Cargando usuarios...</span>
+    </div>
+  } @else {
+    <p-table
+      [value]="users"
+      [paginator]="true"
+      [rows]="10"
+      [rowsPerPageOptions]="[10, 20, 50]"
+      [tableStyle]="{ 'min-width': '58rem' }"
+      responsiveLayout="scroll"
+    >
+      <ng-template #header>
+        <tr>
+          <th>Nombre</th>
+          <th>Email</th>
+          <th>Rol</th>
+          <th>Estado</th>
+        </tr>
+      </ng-template>
+
+      <ng-template #body let-user>
+        <tr>
+          <td>
+            <strong>{{ getDisplayName(user) }}</strong>
+          </td>
+          <td>{{ user.email }}</td>
+          <td>
+            <p-tag
+              [severity]="getRoleSeverity(user.role)"
+              [value]="getRoleLabel(user.role)"
+            />
+          </td>
+          <td>
+            <p-tag
+              [severity]="user.isActive === false ? 'danger' : 'success'"
+              [value]="user.isActive === false ? 'Inactivo' : 'Activo'"
+            />
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template #emptymessage>
+        <tr>
+          <td colspan="4">
+            <div class="empty-state">
+              <i class="pi pi-user-plus"></i>
+              <strong>No hay usuarios registrados</strong>
+              <span>Agregue usuarios internos para operar el sistema.</span>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  }
+</div>
+
+<p-dialog
+  header="Nuevo usuario"
+  [(visible)]="dialogVisible"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="!saving"
+  [style]="{ width: '42rem' }"
+>
+  <form class="user-form" (ngSubmit)="saveUser()">
+    @if (dialogErrorMessage) {
+      <p-message severity="error" [text]="dialogErrorMessage" styleClass="dialog-message" />
+    }
+
+    <div class="form-grid">
+      <div class="field">
+        <label for="firstName">Nombre *</label>
+        <input
+          id="firstName"
+          pInputText
+          name="firstName"
+          [(ngModel)]="form.firstName"
+          [class.p-invalid]="isFieldInvalid('firstName')"
+          autocomplete="off"
+        />
+
+        @if (isFieldInvalid('firstName')) {
+          <small class="field-error">El nombre es obligatorio.</small>
+        }
+      </div>
+
+      <div class="field">
+        <label for="lastName">Apellido *</label>
+        <input
+          id="lastName"
+          pInputText
+          name="lastName"
+          [(ngModel)]="form.lastName"
+          [class.p-invalid]="isFieldInvalid('lastName')"
+          autocomplete="off"
+        />
+
+        @if (isFieldInvalid('lastName')) {
+          <small class="field-error">El apellido es obligatorio.</small>
+        }
+      </div>
+
+      <div class="field">
+        <label for="email">Email *</label>
+        <input
+          id="email"
+          pInputText
+          type="email"
+          name="email"
+          [(ngModel)]="form.email"
+          [class.p-invalid]="isFieldInvalid('email')"
+          autocomplete="off"
+        />
+
+        @if (isFieldInvalid('email')) {
+          <small class="field-error">El email es obligatorio.</small>
+        }
+      </div>
+
+      <div class="field">
+        <label for="password">Contraseña *</label>
+        <input
+          id="password"
+          pInputText
+          type="password"
+          name="password"
+          [(ngModel)]="form.password"
+          [class.p-invalid]="isFieldInvalid('password')"
+          autocomplete="new-password"
+        />
+
+        @if (isFieldInvalid('password')) {
+          <small class="field-error">La contraseña es obligatoria.</small>
+        }
+      </div>
+
+      <div class="field full-width">
+        <label for="role">Rol *</label>
+        <select
+          id="role"
+          name="role"
+          [(ngModel)]="form.role"
+          [class.p-invalid]="isFieldInvalid('role')"
+        >
+          @for (role of roles; track role) {
+            <option [value]="role">{{ getRoleLabel(role) }}</option>
+          }
+        </select>
+
+        @if (isFieldInvalid('role')) {
+          <small class="field-error">El rol es obligatorio.</small>
+        }
+      </div>
+    </div>
+
+    <div class="dialog-actions">
+      <p-button
+        type="button"
+        label="Cancelar"
+        severity="secondary"
+        [outlined]="true"
+        [disabled]="saving"
+        (onClick)="closeDialog()"
+      />
+
+      <p-button
+        type="submit"
+        label="Guardar usuario"
+        icon="pi pi-save"
+        [loading]="saving"
+      />
+    </div>
+  </form>
+</p-dialog>
