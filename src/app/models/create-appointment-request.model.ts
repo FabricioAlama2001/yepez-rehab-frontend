@@ -1,7 +1,7 @@
 export interface CreateAppointmentRequest {
-  patientId: number;
-  physiotherapistId: number;
-  date: string;
-  time: string;
+  patientId: string;
+  physiotherapistId: string;
+  appointmentDate: string;
+  startTime: string;
   notes?: string;
 }

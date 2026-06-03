@@ -1,2 +1,317 @@
-<h1>Agenda</h1>
-<p>Gestión de citas por fecha. En la siguiente fase se conectará con los endpoints de citas.</p>
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Agenda</h1>
+    <p class="page-subtitle">
+      Gestión diaria de citas, cancelaciones, reprogramaciones y atenciones.
+    </p>
+  </div>
+
+  <div class="header-actions">
+    <input
+      pInputText
+      type="date"
+      [(ngModel)]="selectedDate"
+      (change)="onDateChange()"
+    />
+
+    <p-button
+      label="Nueva cita"
+      icon="pi pi-plus"
+      (onClick)="openCreateDialog()"
+    />
+  </div>
+</div>
+
+@if (successMessage) {
+  <p-message severity="success" [text]="successMessage" />
+}
+
+@if (pageErrorMessage) {
+  <p-message severity="error" [text]="pageErrorMessage" />
+}
+
+<div class="card appointments-card">
+  @if (loading) {
+    <div class="loading-state">
+      <i class="pi pi-spin pi-spinner"></i>
+      <span>Cargando agenda...</span>
+    </div>
+  } @else {
+    <p-table
+      [value]="appointments"
+      [paginator]="true"
+      [rows]="10"
+      [rowsPerPageOptions]="[10, 20, 50]"
+      [tableStyle]="{ 'min-width': '78rem' }"
+      responsiveLayout="scroll"
+    >
+      <ng-template #header>
+        <tr>
+          <th>Hora</th>
+          <th>Paciente</th>
+          <th>Fisioterapeuta</th>
+          <th>Estado</th>
+          <th>Notas</th>
+          <th class="actions-column">Acciones</th>
+        </tr>
+      </ng-template>
+
+      <ng-template #body let-appointment>
+        <tr>
+          <td><strong>{{ getAppointmentTime(appointment) }}</strong></td>
+          <td>{{ getPatientName(appointment) }}</td>
+          <td>{{ getPhysiotherapistName(appointment) }}</td>
+          <td>
+            <p-tag
+              [severity]="getStatusSeverity(appointment.status)"
+              [value]="getStatusLabel(appointment.status)"
+            />
+          </td>
+          <td>{{ appointment.notes || 'Sin notas' }}</td>
+          <td>
+            <div class="table-actions">
+              <p-button
+                icon="pi pi-calendar-plus"
+                severity="secondary"
+                [text]="true"
+                [rounded]="true"
+                [disabled]="!canCancel(appointment)"
+                (onClick)="openRescheduleDialog(appointment)"
+              />
+
+              <p-button
+                icon="pi pi-check"
+                severity="success"
+                [text]="true"
+                [rounded]="true"
+                [loading]="actionLoadingId === appointment.id"
+                [disabled]="!canAttend(appointment)"
+                (onClick)="markAsAttended(appointment)"
+              />
+
+              <p-button
+                icon="pi pi-times"
+                severity="danger"
+                [text]="true"
+                [rounded]="true"
+                [loading]="actionLoadingId === appointment.id"
+                [disabled]="!canCancel(appointment)"
+                (onClick)="cancelAppointment(appointment)"
+              />
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template #emptymessage>
+        <tr>
+          <td colspan="6">
+            <div class="empty-state">
+              <i class="pi pi-calendar"></i>
+              <strong>No hay citas para la fecha seleccionada</strong>
+              <span>Registre una nueva cita para organizar la agenda del día.</span>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  }
+</div>
+
+<p-dialog
+  header="Nueva cita"
+  [(visible)]="appointmentDialogVisible"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="!saving"
+  [style]="{ width: '42rem' }"
+>
+  <form class="appointment-form" (ngSubmit)="saveAppointment()">
+    @if (dialogErrorMessage) {
+      <p-message severity="error" [text]="dialogErrorMessage" styleClass="dialog-message" />
+    }
+
+    <div class="form-grid">
+      <div class="field">
+        <label for="patientId">Paciente *</label>
+        <select
+          id="patientId"
+          name="patientId"
+          [(ngModel)]="form.patientId"
+          [class.p-invalid]="isFieldInvalid('patientId')"
+        >
+          <option value="">Seleccione un paciente</option>
+          @for (patient of patients; track patient.id) {
+            <option [value]="patient.id">
+              {{ patient.firstName }} {{ patient.lastName }}
+            </option>
+          }
+        </select>
+
+        @if (isFieldInvalid('patientId')) {
+          <small class="field-error">El paciente es obligatorio.</small>
+        }
+      </div>
+
+      <div class="field">
+        <label for="physiotherapistId">Fisioterapeuta *</label>
+        <select
+          id="physiotherapistId"
+          name="physiotherapistId"
+          [(ngModel)]="form.physiotherapistId"
+          [disabled]="isPhysiotherapistUser"
+          [class.p-invalid]="isFieldInvalid('physiotherapistId')"
+          (change)="onCreateScheduleContextChange()"
+        >
+          <option value="">Seleccione un fisioterapeuta</option>
+          @for (physiotherapist of physiotherapists; track physiotherapist.id) {
+            <option [value]="physiotherapist.id">
+              {{ physiotherapist.fullName || physiotherapist.name || physiotherapist.email }}
+            </option>
+          }
+        </select>
+
+        @if (isFieldInvalid('physiotherapistId')) {
+          <small class="field-error">El fisioterapeuta es obligatorio.</small>
+        }
+      </div>
+
+      <div class="field">
+        <label for="appointmentDate">Fecha *</label>
+        <input
+          id="appointmentDate"
+          pInputText
+          type="date"
+          name="appointmentDate"
+          [(ngModel)]="form.appointmentDate"
+          [class.p-invalid]="isFieldInvalid('appointmentDate')"
+          (change)="onCreateScheduleContextChange()"
+        />
+
+        @if (isFieldInvalid('appointmentDate')) {
+          <small class="field-error">La fecha es obligatoria.</small>
+        }
+      </div>
+
+      <div class="field">
+        <label for="startTime">Hora *</label>
+        <select
+          id="startTime"
+          name="startTime"
+          [(ngModel)]="form.startTime"
+          [class.p-invalid]="isFieldInvalid('startTime')"
+        >
+          <option value="">Seleccione una hora</option>
+
+          @for (slot of getAvailableTimeSlotsForCreate(); track slot) {
+            <option [value]="slot">{{ slot }}</option>
+          }
+
+          @if (getAvailableTimeSlotsForCreate().length === 0) {
+            <option value="" disabled>No hay horarios disponibles</option>
+          }
+        </select>
+
+        @if (isFieldInvalid('startTime')) {
+          <small class="field-error">La hora es obligatoria.</small>
+        }
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="notes">Notas</label>
+      <textarea
+        id="notes"
+        name="notes"
+        [(ngModel)]="form.notes"
+        rows="3"
+      ></textarea>
+    </div>
+
+    <div class="dialog-actions">
+      <p-button
+        type="button"
+        label="Cancelar"
+        severity="secondary"
+        [outlined]="true"
+        [disabled]="saving"
+        (onClick)="closeCreateDialog()"
+      />
+
+      <p-button
+        type="submit"
+        label="Guardar cita"
+        icon="pi pi-save"
+        [loading]="saving"
+      />
+    </div>
+  </form>
+</p-dialog>
+
+<p-dialog
+  header="Reprogramar cita"
+  [(visible)]="rescheduleDialogVisible"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="!saving"
+  [style]="{ width: '32rem' }"
+>
+  <form class="appointment-form" (ngSubmit)="rescheduleAppointment()">
+    @if (dialogErrorMessage) {
+      <p-message severity="error" [text]="dialogErrorMessage" styleClass="dialog-message" />
+    }
+
+    <div class="form-grid one-column">
+      <div class="field">
+        <label for="rescheduleDate">Nueva fecha *</label>
+        <input
+          id="rescheduleDate"
+          pInputText
+          type="date"
+          name="rescheduleDate"
+          [(ngModel)]="rescheduleForm.appointmentDate"
+          (change)="onRescheduleContextChange()"
+        />
+      </div>
+
+      <div class="field">
+        <label for="rescheduleTime">Nueva hora *</label>
+        <select
+          id="rescheduleTime"
+          name="rescheduleTime"
+          [(ngModel)]="rescheduleForm.startTime"
+        >
+          <option value="">Seleccione una hora</option>
+
+          @for (slot of getAvailableTimeSlotsForReschedule(); track slot) {
+            <option [value]="slot">{{ slot }}</option>
+          }
+
+          @if (getAvailableTimeSlotsForReschedule().length === 0) {
+            <option value="" disabled>No hay horarios disponibles</option>
+          }
+        </select>
+      </div>
+    </div>
+
+    <div class="dialog-actions">
+      <p-button
+        type="button"
+        label="Cancelar"
+        severity="secondary"
+        [outlined]="true"
+        [disabled]="saving"
+        (onClick)="closeRescheduleDialog()"
+      />
+
+      <p-button
+        type="submit"
+        label="Reprogramar"
+        icon="pi pi-calendar-plus"
+        [loading]="saving"
+      />
+    </div>
+  </form>
+</p-dialog>

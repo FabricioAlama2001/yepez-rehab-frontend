@@ -4,14 +4,14 @@ import { User } from './user.model';
 export type AppointmentStatus = 'SCHEDULED' | 'CANCELLED' | 'RESCHEDULED' | 'ATTENDED';
 
 export interface Appointment {
-  id: number;
-  date: string;
-  time: string;
+  id: string;
+  appointmentDate: string;
+  startTime: string;
   status: AppointmentStatus;
   patient?: Patient;
-  patientId?: number;
+  patientId?: string;
   physiotherapist?: User;
-  physiotherapistId?: number;
+  physiotherapistId?: string;
   notes?: string;
   createdAt?: string;
   updatedAt?: string;

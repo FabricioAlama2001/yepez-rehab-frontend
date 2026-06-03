@@ -5,6 +5,12 @@ import { environment } from '../../../environments/environment';
 import { Appointment } from '../../models/appointment.model';
 import { CreateAppointmentRequest } from '../../models/create-appointment-request.model';
 
+export interface RescheduleAppointmentRequest {
+  appointmentDate: string;
+  startTime: string;
+  physiotherapistId: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -22,7 +28,7 @@ export class AppointmentsService {
     return this.http.get<Appointment[]>(this.apiUrl, { params });
   }
 
-  getAppointmentById(id: number): Observable<Appointment> {
+  getAppointmentById(id: string): Observable<Appointment> {
     return this.http.get<Appointment>(`${this.apiUrl}/${id}`);
   }
 
@@ -30,15 +36,15 @@ export class AppointmentsService {
     return this.http.post<Appointment>(this.apiUrl, payload);
   }
 
-  cancelAppointment(id: number): Observable<Appointment> {
+  cancelAppointment(id: string): Observable<Appointment> {
     return this.http.put<Appointment>(`${this.apiUrl}/${id}/cancel`, {});
   }
 
-  rescheduleAppointment(id: number, payload: Pick<CreateAppointmentRequest, 'date' | 'time'>): Observable<Appointment> {
+  rescheduleAppointment(id: string, payload: RescheduleAppointmentRequest): Observable<Appointment> {
     return this.http.put<Appointment>(`${this.apiUrl}/${id}/reschedule`, payload);
   }
 
-  markAsAttended(id: number): Observable<Appointment> {
+  markAsAttended(id: string): Observable<Appointment> {
     return this.http.put<Appointment>(`${this.apiUrl}/${id}/attended`, {});
   }
 }

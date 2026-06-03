@@ -1,7 +1,7 @@
 export type UserRole = 'ADMIN' | 'PHYSIOTHERAPIST';
 
 export interface User {
-  id: number;
+  id: string;
   name?: string;
   fullName?: string;
   email: string;
