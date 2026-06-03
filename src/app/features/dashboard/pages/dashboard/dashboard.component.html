@@ -1,24 +1,19 @@
-<h1>Dashboard</h1>
-<p>Resumen inicial del sistema interno de gestión de citas.</p>
+<h1 class="page-title">Dashboard</h1>
+<p class="page-subtitle">Resumen inicial del sistema interno de gestión de citas.</p>
 
-<div class="cards">
-  <article>
-    <span>Pacientes registrados</span>
-    <strong>0</strong>
-  </article>
+<div class="dashboard-grid">
+  @for (metric of metrics; track metric.title) {
+    <p-card styleClass="metric-card">
+      <div class="metric-content">
+        <div>
+          <span>{{ metric.title }}</span>
+          <strong>{{ metric.value }}</strong>
+        </div>
 
-  <article>
-    <span>Citas del día</span>
-    <strong>0</strong>
-  </article>
-
-  <article>
-    <span>Citas canceladas</span>
-    <strong>0</strong>
-  </article>
-
-  <article>
-    <span>Citas atendidas</span>
-    <strong>0</strong>
-  </article>
+        <div class="metric-icon">
+          <i [class]="metric.icon"></i>
+        </div>
+      </div>
+    </p-card>
+  }
 </div>

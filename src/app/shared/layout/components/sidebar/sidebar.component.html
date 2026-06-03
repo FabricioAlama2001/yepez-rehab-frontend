@@ -1,11 +1,25 @@
 <aside class="sidebar">
   <nav>
-    <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
-    <a routerLink="/patients" routerLinkActive="active">Pacientes</a>
-    <a routerLink="/appointments" routerLinkActive="active">Agenda</a>
+    <a routerLink="/dashboard" routerLinkActive="active">
+      <i class="pi pi-home"></i>
+      <span>Dashboard</span>
+    </a>
+
+    <a routerLink="/patients" routerLinkActive="active">
+      <i class="pi pi-users"></i>
+      <span>Pacientes</span>
+    </a>
+
+    <a routerLink="/appointments" routerLinkActive="active">
+      <i class="pi pi-calendar"></i>
+      <span>Agenda</span>
+    </a>
 
     @if (authService.isAdmin()) {
-      <a routerLink="/users" routerLinkActive="active">Usuarios</a>
+      <a routerLink="/users" routerLinkActive="active">
+        <i class="pi pi-user-plus"></i>
+        <span>Usuarios</span>
+      </a>
     }
   </nav>
 </aside>

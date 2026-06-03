@@ -1,28 +1,66 @@
 <section class="login-page">
-  <form class="login-card" (ngSubmit)="login()">
-    <h1>Yépez Rehab Center</h1>
-    <p>Sistema interno de gestión de citas</p>
+  <div class="login-shell">
+    <div class="brand-panel">
+      <div class="brand-icon">
+        <i class="pi pi-calendar-clock"></i>
+      </div>
 
-    <label>
-      Email
-      <input type="email" name="email" [(ngModel)]="email" />
-    </label>
+      <h1>Yépez Rehab Center</h1>
+      <p>
+        Sistema interno para organizar pacientes, agenda diaria y citas del centro.
+      </p>
 
-    <label>
-      Contraseña
-      <input type="password" name="password" [(ngModel)]="password" />
-    </label>
+      <div class="brand-footer">
+        <i class="pi pi-shield"></i>
+        Acceso seguro para personal autorizado
+      </div>
+    </div>
 
-    @if (errorMessage) {
-      <div class="error">{{ errorMessage }}</div>
-    }
+    <form class="login-card" (ngSubmit)="login()">
+      <div class="login-header">
+        <h2>Bienvenido</h2>
+        <p>Ingrese sus credenciales para continuar</p>
+      </div>
 
-    <button type="submit" [disabled]="loading">
-      @if (loading) {
-        Ingresando...
-      } @else {
-        Iniciar sesión
+      <div class="field">
+        <label for="email">Email</label>
+        <span class="p-input-icon-left">
+          <i class="pi pi-envelope"></i>
+          <input
+            id="email"
+            pInputText
+            type="email"
+            name="email"
+            [(ngModel)]="email"
+            autocomplete="email"
+          />
+        </span>
+      </div>
+
+      <div class="field">
+        <label for="password">Contraseña</label>
+        <p-password
+          inputId="password"
+          name="password"
+          [(ngModel)]="password"
+          [toggleMask]="true"
+          [feedback]="false"
+          styleClass="w-full"
+          inputStyleClass="w-full"
+        />
+      </div>
+
+      @if (errorMessage) {
+        <p-message severity="error" [text]="errorMessage" />
       }
-    </button>
-  </form>
+
+      <p-button
+        type="submit"
+        label="Iniciar sesión"
+        icon="pi pi-sign-in"
+        [loading]="loading"
+        styleClass="w-full login-button"
+      />
+    </form>
+  </div>
 </section>

@@ -1,3 +1,25 @@
+@import "primeicons/primeicons.css";
+
+:root {
+  --yrc-primary: #14b8a6;
+  --yrc-primary-dark: #0f766e;
+  --yrc-primary-light: #ccfbf1;
+  --yrc-primary-soft: #e6fffb;
+
+  --yrc-accent: #d8c089;
+  --yrc-accent-soft: #f7efd9;
+
+  --yrc-bg: #f6f9fc;
+  --yrc-surface: #ffffff;
+  --yrc-border: #e2e8f0;
+
+  --yrc-text: #0f172a;
+  --yrc-muted: #64748b;
+
+  --yrc-radius: 1rem;
+  --yrc-shadow: 0 10px 30px rgb(15 23 42 / 6%);
+}
+
 * {
   box-sizing: border-box;
 }
@@ -6,14 +28,42 @@ html,
 body {
   height: 100%;
   margin: 0;
-  font-family: Inter, Arial, sans-serif;
-  color: #111827;
-  background: #f9fafb;
+  font-family: Inter, "Segoe UI", Roboto, Arial, sans-serif;
+  color: var(--yrc-text);
+  background: var(--yrc-bg);
+}
+
+body {
+  overflow-x: hidden;
+}
+
+a {
+  text-decoration: none;
 }
 
 button,
 input,
 textarea,
 select {
-  font: inherit;
+  font-family: inherit;
+}
+
+.page-title {
+  margin: 0 0 0.5rem;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--yrc-text);
+  letter-spacing: -0.03em;
+}
+
+.page-subtitle {
+  margin: 0 0 1.5rem;
+  color: var(--yrc-muted);
+}
+
+.card {
+  padding: 1.5rem;
+  border-radius: var(--yrc-radius);
+  background: var(--yrc-surface);
+  box-shadow: var(--yrc-shadow);
 }
