@@ -1,0 +1,28 @@
+<section class="login-page">
+  <form class="login-card" (ngSubmit)="login()">
+    <h1>Yépez Rehab Center</h1>
+    <p>Sistema interno de gestión de citas</p>
+
+    <label>
+      Email
+      <input type="email" name="email" [(ngModel)]="email" />
+    </label>
+
+    <label>
+      Contraseña
+      <input type="password" name="password" [(ngModel)]="password" />
+    </label>
+
+    @if (errorMessage) {
+      <div class="error">{{ errorMessage }}</div>
+    }
+
+    <button type="submit" [disabled]="loading">
+      @if (loading) {
+        Ingresando...
+      } @else {
+        Iniciar sesión
+      }
+    </button>
+  </form>
+</section>

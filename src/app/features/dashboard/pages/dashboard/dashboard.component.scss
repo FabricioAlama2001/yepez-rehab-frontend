@@ -1,0 +1,23 @@
+.cards {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+article {
+  padding: 1.5rem;
+  border-radius: 1rem;
+  background: #ffffff;
+  box-shadow: 0 10px 30px rgb(0 0 0 / 6%);
+}
+
+span {
+  display: block;
+  color: #6b7280;
+}
+
+strong {
+  display: block;
+  margin-top: 0.75rem;
+  font-size: 2rem;
+}

@@ -1,0 +1,11 @@
+<aside class="sidebar">
+  <nav>
+    <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+    <a routerLink="/patients" routerLinkActive="active">Pacientes</a>
+    <a routerLink="/appointments" routerLinkActive="active">Agenda</a>
+
+    @if (authService.isAdmin()) {
+      <a routerLink="/users" routerLinkActive="active">Usuarios</a>
+    }
+  </nav>
+</aside>
