@@ -17,7 +17,7 @@ export class PatientsService {
     return this.http.get<Patient[]>(this.apiUrl);
   }
 
-  getPatientById(id: number): Observable<Patient> {
+  getPatientById(id: string): Observable<Patient> {
     return this.http.get<Patient>(`${this.apiUrl}/${id}`);
   }
 
@@ -25,19 +25,19 @@ export class PatientsService {
     return this.http.post<Patient>(this.apiUrl, payload);
   }
 
-  updatePatient(id: number, payload: Partial<CreatePatientRequest>): Observable<Patient> {
+  updatePatient(id: string, payload: Partial<CreatePatientRequest>): Observable<Patient> {
     return this.http.put<Patient>(`${this.apiUrl}/${id}`, payload);
   }
 
-  createInitialRecord(patientId: number, payload: InitialRecord): Observable<InitialRecord> {
+  createInitialRecord(patientId: string, payload: InitialRecord): Observable<InitialRecord> {
     return this.http.post<InitialRecord>(`${this.apiUrl}/${patientId}/initial-record`, payload);
   }
 
-  getInitialRecord(patientId: number): Observable<InitialRecord> {
+  getInitialRecord(patientId: string): Observable<InitialRecord> {
     return this.http.get<InitialRecord>(`${this.apiUrl}/${patientId}/initial-record`);
   }
 
-  updateInitialRecord(patientId: number, payload: InitialRecord): Observable<InitialRecord> {
+  updateInitialRecord(patientId: string, payload: InitialRecord): Observable<InitialRecord> {
     return this.http.put<InitialRecord>(`${this.apiUrl}/${patientId}/initial-record`, payload);
   }
 }

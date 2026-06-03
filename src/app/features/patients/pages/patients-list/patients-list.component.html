@@ -1,2 +1,215 @@
-<h1>Pacientes</h1>
-<p>Listado y gestión de pacientes. En la siguiente fase se conectará con el backend.</p>
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Pacientes</h1>
+    <p class="page-subtitle">
+      Gestión de pacientes registrados en Yépez Rehab Center.
+    </p>
+  </div>
+
+  <p-button
+    label="Nuevo paciente"
+    icon="pi pi-plus"
+    (onClick)="openCreateDialog()"
+  />
+</div>
+
+@if (successMessage) {
+  <p-message severity="success" [text]="successMessage" />
+}
+
+@if (pageErrorMessage) {
+  <p-message severity="error" [text]="pageErrorMessage" />
+}
+
+<div class="card patients-card">
+  @if (loading) {
+    <div class="loading-state">
+      <i class="pi pi-spin pi-spinner"></i>
+      <span>Cargando pacientes...</span>
+    </div>
+  } @else {
+    <p-table
+      [value]="patients"
+      [paginator]="true"
+      [rows]="10"
+      [rowsPerPageOptions]="[10, 20, 50]"
+      [tableStyle]="{ 'min-width': '64rem' }"
+      responsiveLayout="scroll"
+    >
+      <ng-template #header>
+        <tr>
+          <th>Paciente</th>
+          <th>Identificación</th>
+          <th>Teléfono</th>
+          <th>Email</th>
+          <th>Fecha nacimiento</th>
+          <th>Estado</th>
+        </tr>
+      </ng-template>
+
+      <ng-template #body let-patient>
+        <tr>
+          <td>
+            <strong>{{ getFullName(patient) }}</strong>
+          </td>
+          <td>{{ patient.identification || 'No registrado' }}</td>
+          <td>{{ patient.phone || 'No registrado' }}</td>
+          <td>{{ patient.email || 'No registrado' }}</td>
+          <td>{{ patient.birthDate || 'No registrado' }}</td>
+          <td>
+            <p-tag severity="success" value="Activo" />
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template #emptymessage>
+        <tr>
+          <td colspan="6">
+            <div class="empty-state">
+              <i class="pi pi-users"></i>
+              <strong>No hay pacientes registrados</strong>
+              <span>Agregue el primer paciente para iniciar la gestión.</span>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  }
+</div>
+
+<p-dialog
+  header="Nuevo paciente"
+  [(visible)]="dialogVisible"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="!saving"
+  [style]="{ width: '42rem' }"
+>
+  <form class="patient-form" (ngSubmit)="savePatient()">
+    @if (dialogErrorMessage) {
+      <p-message
+        severity="error"
+        [text]="dialogErrorMessage"
+        styleClass="dialog-message"
+      />
+    }
+
+    <div class="form-grid">
+      <div class="field">
+        <label for="firstName">Nombre *</label>
+        <input
+          id="firstName"
+          pInputText
+          name="firstName"
+          [(ngModel)]="form.firstName"
+          [class.p-invalid]="isFieldInvalid('firstName')"
+          autocomplete="off"
+        />
+
+        @if (isFieldInvalid('firstName')) {
+          <small class="field-error">El nombre es obligatorio.</small>
+        }
+      </div>
+
+      <div class="field">
+        <label for="lastName">Apellido *</label>
+        <input
+          id="lastName"
+          pInputText
+          name="lastName"
+          [(ngModel)]="form.lastName"
+          [class.p-invalid]="isFieldInvalid('lastName')"
+          autocomplete="off"
+        />
+
+        @if (isFieldInvalid('lastName')) {
+          <small class="field-error">El apellido es obligatorio.</small>
+        }
+      </div>
+
+      <div class="field">
+        <label for="identification">Identificación *</label>
+        <input
+          id="identification"
+          pInputText
+          name="identification"
+          [(ngModel)]="form.identification"
+          [class.p-invalid]="isFieldInvalid('identification')"
+          autocomplete="off"
+        />
+
+        @if (isFieldInvalid('identification')) {
+          <small class="field-error">La identificación es obligatoria.</small>
+        }
+      </div>
+
+      <div class="field">
+        <label for="phone">Teléfono *</label>
+        <input
+          id="phone"
+          pInputText
+          name="phone"
+          [(ngModel)]="form.phone"
+          [class.p-invalid]="isFieldInvalid('phone')"
+          autocomplete="off"
+        />
+
+        @if (isFieldInvalid('phone')) {
+          <small class="field-error">El teléfono es obligatorio.</small>
+        }
+      </div>
+
+      <div class="field">
+        <label for="email">Email *</label>
+        <input
+          id="email"
+          pInputText
+          type="email"
+          name="email"
+          [(ngModel)]="form.email"
+          [class.p-invalid]="isFieldInvalid('email')"
+          autocomplete="off"
+        />
+
+        @if (isFieldInvalid('email')) {
+          <small class="field-error">El email es obligatorio.</small>
+        }
+      </div>
+
+      <div class="field">
+        <label for="birthDate">Fecha de nacimiento *</label>
+        <input
+          id="birthDate"
+          pInputText
+          type="date"
+          name="birthDate"
+          [(ngModel)]="form.birthDate"
+          [class.p-invalid]="isFieldInvalid('birthDate')"
+        />
+
+        @if (isFieldInvalid('birthDate')) {
+          <small class="field-error">La fecha de nacimiento es obligatoria.</small>
+        }
+      </div>
+    </div>
+
+    <div class="dialog-actions">
+      <p-button
+        type="button"
+        label="Cancelar"
+        severity="secondary"
+        [outlined]="true"
+        [disabled]="saving"
+        (onClick)="closeDialog()"
+      />
+
+      <p-button
+        type="submit"
+        label="Guardar paciente"
+        icon="pi pi-save"
+        [loading]="saving"
+      />
+    </div>
+  </form>
+</p-dialog>
