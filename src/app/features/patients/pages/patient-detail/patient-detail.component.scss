@@ -1,3 +1,136 @@
-:host {
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  gap: 1.25rem;
+}
+
+.patient-card,
+.record-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.section-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.section-header h2 {
+  margin: 0;
+  color: var(--yrc-text);
+}
+
+.section-header p {
+  margin: 0.35rem 0 0;
+  color: var(--yrc-muted);
+}
+
+.info-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.info-grid div {
+  padding: 1rem;
+  border: 1px solid var(--yrc-border);
+  border-radius: 0.9rem;
+  background: #f8fafc;
+}
+
+.info-grid span {
   display: block;
+  margin-bottom: 0.35rem;
+  color: var(--yrc-muted);
+  font-size: 0.85rem;
+}
+
+.info-grid strong {
+  color: var(--yrc-text);
+}
+
+.loading-card,
+.loading-record {
+  min-height: 12rem;
+  display: grid;
+  place-items: center;
+  gap: 0.75rem;
+  color: var(--yrc-muted);
+}
+
+.loading-card i,
+.loading-record i {
+  font-size: 2rem;
+  color: var(--yrc-primary);
+}
+
+.record-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.field label {
+  font-weight: 600;
+  color: #334155;
+}
+
+textarea {
+  width: 100%;
+  resize: vertical;
+  padding: 0.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.75rem;
+  font-family: inherit;
+  color: var(--yrc-text);
+  background: #ffffff;
+}
+
+textarea:focus {
+  outline: none;
+  border-color: var(--yrc-primary);
+  box-shadow: 0 0 0 3px rgb(20 184 166 / 14%);
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+@media (max-width: 1080px) {
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .page-header {
+    flex-direction: column;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
 }

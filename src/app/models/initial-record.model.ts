@@ -1,6 +1,6 @@
 export interface InitialRecord {
-  id?: number;
-  patientId?: number;
+  id?: string;
+  patientId?: string;
   reasonForConsultation?: string;
   painDescription?: string;
   medicalHistory?: string;

@@ -1,2 +1,136 @@
-<h1>Detalle de paciente</h1>
-<p>Vista preparada para ficha inicial básica.</p>
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Detalle de paciente</h1>
+    <p class="page-subtitle">Información administrativa y ficha inicial básica.</p>
+  </div>
+
+  <p-button
+    label="Volver"
+    icon="pi pi-arrow-left"
+    severity="secondary"
+    [outlined]="true"
+    routerLink="/patients"
+  />
+</div>
+
+@if (pageErrorMessage) {
+  <p-message severity="error" [text]="pageErrorMessage" />
+}
+
+@if (successMessage) {
+  <p-message severity="success" [text]="successMessage" />
+}
+
+@if (loadingPatient) {
+  <div class="card loading-card">
+    <i class="pi pi-spin pi-spinner"></i>
+    <span>Cargando paciente...</span>
+  </div>
+} @else if (patient) {
+  <div class="detail-grid">
+    <section class="card patient-card">
+      <div class="section-header">
+        <div>
+          <h2>{{ getFullName() }}</h2>
+          <p>Datos administrativos del paciente.</p>
+        </div>
+
+        <p-tag
+          [severity]="patient.isActive === false ? 'danger' : 'success'"
+          [value]="patient.isActive === false ? 'Inactivo' : 'Activo'"
+        />
+      </div>
+
+      <div class="info-grid">
+        <div>
+          <span>Identificación</span>
+          <strong>{{ patient.identification || 'No registrado' }}</strong>
+        </div>
+
+        <div>
+          <span>Teléfono</span>
+          <strong>{{ patient.phone || 'No registrado' }}</strong>
+        </div>
+
+        <div>
+          <span>Email</span>
+          <strong>{{ patient.email || 'No registrado' }}</strong>
+        </div>
+
+        <div>
+          <span>Fecha de nacimiento</span>
+          <strong>{{ patient.birthDate || 'No registrado' }}</strong>
+        </div>
+      </div>
+    </section>
+
+    <section class="card record-card">
+      <div class="section-header">
+        <div>
+          <h2>Ficha inicial básica</h2>
+          <p>No constituye historia clínica completa; es información de apoyo inicial.</p>
+        </div>
+
+        @if (hasInitialRecord) {
+          <p-tag severity="info" value="Registrada" />
+        } @else {
+          <p-tag severity="warn" value="Pendiente" />
+        }
+      </div>
+
+      @if (recordErrorMessage) {
+        <p-message severity="error" [text]="recordErrorMessage" />
+      }
+
+      @if (loadingRecord) {
+        <div class="loading-record">
+          <i class="pi pi-spin pi-spinner"></i>
+          <span>Cargando ficha inicial...</span>
+        </div>
+      } @else {
+        <form class="record-form" (ngSubmit)="saveInitialRecord()">
+          <div class="field">
+            <label for="painDescription">Descripción del dolor *</label>
+            <textarea
+              id="painDescription"
+              name="painDescription"
+              [(ngModel)]="recordForm.painDescription"
+              rows="3"
+            ></textarea>
+          </div>
+
+          <div class="form-grid">
+            <div class="field">
+              <label for="medicalHistory">Antecedentes</label>
+              <textarea id="medicalHistory" name="medicalHistory" [(ngModel)]="recordForm.medicalHistory" rows="3"></textarea>
+            </div>
+
+            <div class="field">
+              <label for="allergies">Alergias</label>
+              <textarea id="allergies" name="allergies" [(ngModel)]="recordForm.allergies" rows="3"></textarea>
+            </div>
+
+            <div class="field">
+              <label for="currentMedication">Medicación actual</label>
+              <textarea id="currentMedication" name="currentMedication" [(ngModel)]="recordForm.currentMedication" rows="3"></textarea>
+            </div>
+
+            <div class="field">
+              <label for="previousTherapy">Experiencia previa con terapia</label>
+              <textarea id="previousTherapy" name="previousTherapy" [(ngModel)]="recordForm.previousTherapy" rows="3"></textarea>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <p-button
+              type="submit"
+              [label]="hasInitialRecord ? 'Actualizar ficha' : 'Guardar ficha'"
+              icon="pi pi-save"
+              [loading]="savingRecord"
+            />
+          </div>
+        </form>
+      }
+    </section>
+  </div>
+}

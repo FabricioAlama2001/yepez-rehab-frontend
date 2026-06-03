@@ -112,3 +112,14 @@
     grid-template-columns: 1fr;
   }
 }
+
+.actions-column {
+  width: 9rem;
+  text-align: center;
+}
+
+.table-actions {
+  display: flex;
+  justify-content: center;
+  gap: 0.25rem;
+}

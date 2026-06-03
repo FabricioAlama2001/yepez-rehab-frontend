@@ -1,6 +1,7 @@
 import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
+import { RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
@@ -18,6 +19,7 @@ import { CreatePatientRequest } from '../../../../models/create-patient-request.
   standalone: true,
   imports: [
     FormsModule,
+    RouterLink,
     TableModule,
     ButtonModule,
     DialogModule,
@@ -33,9 +35,10 @@ export class PatientsListComponent implements OnInit {
   private readonly cdr = inject(ChangeDetectorRef);
 
   patients: Patient[] = [];
+  selectedPatient: Patient | null = null;
+
   loading = false;
   saving = false;
-
   dialogVisible = false;
   submitted = false;
 
@@ -44,6 +47,10 @@ export class PatientsListComponent implements OnInit {
   successMessage = '';
 
   form: CreatePatientRequest = this.createEmptyForm();
+
+  get isEditMode(): boolean {
+    return !!this.selectedPatient;
+  }
 
   ngOnInit(): void {
     this.loadPatients();
@@ -74,11 +81,24 @@ export class PatientsListComponent implements OnInit {
   }
 
   openCreateDialog(): void {
+    this.selectedPatient = null;
     this.form = this.createEmptyForm();
-    this.submitted = false;
-    this.pageErrorMessage = '';
-    this.dialogErrorMessage = '';
-    this.successMessage = '';
+    this.resetDialogState();
+    this.dialogVisible = true;
+  }
+
+  openEditDialog(patient: Patient): void {
+    this.selectedPatient = patient;
+    this.form = {
+      firstName: patient.firstName ?? '',
+      lastName: patient.lastName ?? '',
+      identification: patient.identification ?? '',
+      phone: patient.phone ?? '',
+      email: patient.email ?? '',
+      birthDate: patient.birthDate ?? ''
+    };
+
+    this.resetDialogState();
     this.dialogVisible = true;
   }
 
@@ -103,19 +123,16 @@ export class PatientsListComponent implements OnInit {
       return;
     }
 
-    const payload: CreatePatientRequest = {
-      firstName: this.form.firstName.trim(),
-      lastName: this.form.lastName.trim(),
-      identification: this.form.identification?.trim(),
-      phone: this.form.phone?.trim(),
-      email: this.form.email?.trim(),
-      birthDate: this.form.birthDate
-    };
+    const payload = this.buildPayload();
 
     this.saving = true;
     this.cdr.markForCheck();
 
-    this.patientsService.createPatient(payload)
+    const request$ = this.isEditMode && this.selectedPatient
+      ? this.patientsService.updatePatient(this.selectedPatient.id, payload)
+      : this.patientsService.createPatient(payload);
+
+    request$
       .pipe(
         finalize(() => {
           this.saving = false;
@@ -123,12 +140,21 @@ export class PatientsListComponent implements OnInit {
         })
       )
       .subscribe({
-        next: (createdPatient) => {
-          this.patients = [createdPatient, ...this.patients];
+        next: (savedPatient) => {
+          if (this.isEditMode) {
+            this.patients = this.patients.map((patient) =>
+              patient.id === savedPatient.id ? savedPatient : patient
+            );
+            this.successMessage = 'Paciente actualizado correctamente.';
+          } else {
+            this.patients = [savedPatient, ...this.patients];
+            this.successMessage = 'Paciente registrado correctamente.';
+          }
+
           this.dialogVisible = false;
           this.submitted = false;
+          this.selectedPatient = null;
           this.form = this.createEmptyForm();
-          this.successMessage = 'Paciente registrado correctamente.';
           this.cdr.markForCheck();
         },
         error: (error: HttpErrorResponse) => {
@@ -145,6 +171,24 @@ export class PatientsListComponent implements OnInit {
 
   getFullName(patient: Patient): string {
     return `${patient.firstName ?? ''} ${patient.lastName ?? ''}`.trim();
+  }
+
+  private resetDialogState(): void {
+    this.submitted = false;
+    this.pageErrorMessage = '';
+    this.dialogErrorMessage = '';
+    this.successMessage = '';
+  }
+
+  private buildPayload(): CreatePatientRequest {
+    return {
+      firstName: this.form.firstName.trim(),
+      lastName: this.form.lastName.trim(),
+      identification: this.form.identification?.trim(),
+      phone: this.form.phone?.trim(),
+      email: this.form.email?.trim(),
+      birthDate: this.form.birthDate
+    };
   }
 
   private isFormInvalid(): boolean {
@@ -177,7 +221,9 @@ export class PatientsListComponent implements OnInit {
       return 'No se pudo conectar con el backend.';
     }
 
-    return 'No se pudo registrar el paciente. Revise los datos ingresados.';
+    return this.isEditMode
+      ? 'No se pudo actualizar el paciente.'
+      : 'No se pudo registrar el paciente. Revise los datos ingresados.';
   }
 
   private createEmptyForm(): CreatePatientRequest {

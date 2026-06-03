@@ -33,7 +33,7 @@
       [paginator]="true"
       [rows]="10"
       [rowsPerPageOptions]="[10, 20, 50]"
-      [tableStyle]="{ 'min-width': '64rem' }"
+      [tableStyle]="{ 'min-width': '72rem' }"
       responsiveLayout="scroll"
     >
       <ng-template #header>
@@ -44,27 +44,48 @@
           <th>Email</th>
           <th>Fecha nacimiento</th>
           <th>Estado</th>
+          <th class="actions-column">Acciones</th>
         </tr>
       </ng-template>
 
       <ng-template #body let-patient>
         <tr>
-          <td>
-            <strong>{{ getFullName(patient) }}</strong>
-          </td>
+          <td><strong>{{ getFullName(patient) }}</strong></td>
           <td>{{ patient.identification || 'No registrado' }}</td>
           <td>{{ patient.phone || 'No registrado' }}</td>
           <td>{{ patient.email || 'No registrado' }}</td>
           <td>{{ patient.birthDate || 'No registrado' }}</td>
           <td>
-            <p-tag severity="success" value="Activo" />
+            <p-tag
+              [severity]="patient.isActive === false ? 'danger' : 'success'"
+              [value]="patient.isActive === false ? 'Inactivo' : 'Activo'"
+            />
+          </td>
+          <td>
+            <div class="table-actions">
+              <p-button
+                icon="pi pi-eye"
+                severity="info"
+                [text]="true"
+                [rounded]="true"
+                [routerLink]="['/patients', patient.id]"
+              />
+
+              <p-button
+                icon="pi pi-pencil"
+                severity="secondary"
+                [text]="true"
+                [rounded]="true"
+                (onClick)="openEditDialog(patient)"
+              />
+            </div>
           </td>
         </tr>
       </ng-template>
 
       <ng-template #emptymessage>
         <tr>
-          <td colspan="6">
+          <td colspan="7">
             <div class="empty-state">
               <i class="pi pi-users"></i>
               <strong>No hay pacientes registrados</strong>
@@ -78,7 +99,7 @@
 </div>
 
 <p-dialog
-  header="Nuevo paciente"
+  [header]="isEditMode ? 'Editar paciente' : 'Nuevo paciente'"
   [(visible)]="dialogVisible"
   [modal]="true"
   [draggable]="false"
@@ -88,25 +109,13 @@
 >
   <form class="patient-form" (ngSubmit)="savePatient()">
     @if (dialogErrorMessage) {
-      <p-message
-        severity="error"
-        [text]="dialogErrorMessage"
-        styleClass="dialog-message"
-      />
+      <p-message severity="error" [text]="dialogErrorMessage" styleClass="dialog-message" />
     }
 
     <div class="form-grid">
       <div class="field">
         <label for="firstName">Nombre *</label>
-        <input
-          id="firstName"
-          pInputText
-          name="firstName"
-          [(ngModel)]="form.firstName"
-          [class.p-invalid]="isFieldInvalid('firstName')"
-          autocomplete="off"
-        />
-
+        <input id="firstName" pInputText name="firstName" [(ngModel)]="form.firstName" [class.p-invalid]="isFieldInvalid('firstName')" autocomplete="off" />
         @if (isFieldInvalid('firstName')) {
           <small class="field-error">El nombre es obligatorio.</small>
         }
@@ -114,15 +123,7 @@
 
       <div class="field">
         <label for="lastName">Apellido *</label>
-        <input
-          id="lastName"
-          pInputText
-          name="lastName"
-          [(ngModel)]="form.lastName"
-          [class.p-invalid]="isFieldInvalid('lastName')"
-          autocomplete="off"
-        />
-
+        <input id="lastName" pInputText name="lastName" [(ngModel)]="form.lastName" [class.p-invalid]="isFieldInvalid('lastName')" autocomplete="off" />
         @if (isFieldInvalid('lastName')) {
           <small class="field-error">El apellido es obligatorio.</small>
         }
@@ -130,15 +131,7 @@
 
       <div class="field">
         <label for="identification">Identificación *</label>
-        <input
-          id="identification"
-          pInputText
-          name="identification"
-          [(ngModel)]="form.identification"
-          [class.p-invalid]="isFieldInvalid('identification')"
-          autocomplete="off"
-        />
-
+        <input id="identification" pInputText name="identification" [(ngModel)]="form.identification" [class.p-invalid]="isFieldInvalid('identification')" autocomplete="off" />
         @if (isFieldInvalid('identification')) {
           <small class="field-error">La identificación es obligatoria.</small>
         }
@@ -146,15 +139,7 @@
 
       <div class="field">
         <label for="phone">Teléfono *</label>
-        <input
-          id="phone"
-          pInputText
-          name="phone"
-          [(ngModel)]="form.phone"
-          [class.p-invalid]="isFieldInvalid('phone')"
-          autocomplete="off"
-        />
-
+        <input id="phone" pInputText name="phone" [(ngModel)]="form.phone" [class.p-invalid]="isFieldInvalid('phone')" autocomplete="off" />
         @if (isFieldInvalid('phone')) {
           <small class="field-error">El teléfono es obligatorio.</small>
         }
@@ -162,16 +147,7 @@
 
       <div class="field">
         <label for="email">Email *</label>
-        <input
-          id="email"
-          pInputText
-          type="email"
-          name="email"
-          [(ngModel)]="form.email"
-          [class.p-invalid]="isFieldInvalid('email')"
-          autocomplete="off"
-        />
-
+        <input id="email" pInputText type="email" name="email" [(ngModel)]="form.email" [class.p-invalid]="isFieldInvalid('email')" autocomplete="off" />
         @if (isFieldInvalid('email')) {
           <small class="field-error">El email es obligatorio.</small>
         }
@@ -179,15 +155,7 @@
 
       <div class="field">
         <label for="birthDate">Fecha de nacimiento *</label>
-        <input
-          id="birthDate"
-          pInputText
-          type="date"
-          name="birthDate"
-          [(ngModel)]="form.birthDate"
-          [class.p-invalid]="isFieldInvalid('birthDate')"
-        />
-
+        <input id="birthDate" pInputText type="date" name="birthDate" [(ngModel)]="form.birthDate" [class.p-invalid]="isFieldInvalid('birthDate')" />
         @if (isFieldInvalid('birthDate')) {
           <small class="field-error">La fecha de nacimiento es obligatoria.</small>
         }
@@ -195,18 +163,11 @@
     </div>
 
     <div class="dialog-actions">
-      <p-button
-        type="button"
-        label="Cancelar"
-        severity="secondary"
-        [outlined]="true"
-        [disabled]="saving"
-        (onClick)="closeDialog()"
-      />
+      <p-button type="button" label="Cancelar" severity="secondary" [outlined]="true" [disabled]="saving" (onClick)="closeDialog()" />
 
       <p-button
         type="submit"
-        label="Guardar paciente"
+        [label]="isEditMode ? 'Actualizar paciente' : 'Guardar paciente'"
         icon="pi pi-save"
         [loading]="saving"
       />
