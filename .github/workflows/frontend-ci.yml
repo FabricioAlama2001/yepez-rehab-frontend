@@ -1,19 +1,19 @@
 name: Frontend CI
 
 on:
-  push:
-    branches:
-      - develop
-      - main
   pull_request:
     branches:
-      - develop
       - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   build:
     name: Build Angular frontend
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
       - name: Checkout repository
@@ -28,5 +28,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build frontend
+      - name: Dependency audit
+        continue-on-error: true
+        run: npm audit --audit-level=high
+
+      - name: Build Angular frontend
         run: npm run build
