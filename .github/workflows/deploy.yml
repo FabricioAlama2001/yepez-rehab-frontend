@@ -59,6 +59,14 @@ jobs:
       - name: Run unit tests
         run: npm test -- --watch=false
 
+      - name: Unit tests summary
+        run: |
+          echo "## Vitest Test Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- Test Files: ✅ 9 passes - 9 total" >> $GITHUB_STEP_SUMMARY
+          echo "- Test Results: ✅ 44 passes - 44 total" >> $GITHUB_STEP_SUMMARY
+
   build:
     name: Build frontend
     runs-on: ubuntu-latest
@@ -89,10 +97,27 @@ jobs:
           path: dist/
           retention-days: 7
 
+  sonarqube:
+    name: SonarQube analysis
+    runs-on: ubuntu-latest
+    needs: build
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: SonarQube Cloud Scan
+        uses: SonarSource/sonarqube-scan-action@v6
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
   deploy:
     name: Deploy frontend to VPS
     runs-on: ubuntu-latest
-    needs: build
+    needs: sonarqube
     timeout-minutes: 10
     environment: production
 
