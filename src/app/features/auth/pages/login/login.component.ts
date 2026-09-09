@@ -1,4 +1,5 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, inject } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
@@ -13,11 +14,12 @@ import { AuthService } from '../../../../core/services/auth.service';
   standalone: true,
   imports: [FormsModule, ButtonModule, InputTextModule, PasswordModule, MessageModule],
   templateUrl: './login.component.html',
-  styleUrl: './login.component.scss'
+  styleUrl: './login.component.scss',
 })
 export class LoginComponent {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   email = '';
   password = '';
@@ -39,12 +41,19 @@ export class LoginComponent {
     this.authService.login(this.email.trim(), this.password.trim()).subscribe({
       next: () => {
         this.loading = false;
+        this.cdr.markForCheck();
         this.router.navigate(['/dashboard']);
       },
-      error: () => {
+      error: (error: HttpErrorResponse) => {
         this.loading = false;
-        this.errorMessage = 'Credenciales inválidas o backend no disponible.';
-      }
+
+        this.errorMessage =
+          error.status === 401
+            ? 'Credenciales inválidas.'
+            : 'No fue posible conectar con el servidor.';
+
+        this.cdr.markForCheck();
+      },
     });
   }
 

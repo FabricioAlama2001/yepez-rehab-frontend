@@ -90,6 +90,6 @@ describe('LoginComponent', () => {
     component.login();
 
     expect(component.loading).toBe(false);
-    expect(component.errorMessage).toBe('Credenciales inválidas o backend no disponible.');
+    expect(component.errorMessage).toBe('Credenciales inválidas');
   });
 });
