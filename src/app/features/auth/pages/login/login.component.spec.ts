@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { vi } from 'vitest';
 import { of, throwError } from 'rxjs';
-
+import { HttpErrorResponse } from '@angular/common/http';
 import { LoginComponent } from './login.component';
 import { AuthService } from '../../../../core/services/auth.service';
 
@@ -82,7 +82,15 @@ describe('LoginComponent', () => {
   });
 
   it('should show error message when login fails', () => {
-    authServiceMock.login.mockReturnValue(throwError(() => new Error('Invalid credentials')));
+    const unauthorizedError = new HttpErrorResponse({
+      status: 401,
+      statusText: 'Unauthorized',
+      error: {
+        message: 'Credenciales inválidas',
+      },
+    });
+
+    authServiceMock.login.mockReturnValue(throwError(() => unauthorizedError));
 
     component.email = 'admin@test.com';
     component.password = 'wrong-password';
@@ -90,6 +98,6 @@ describe('LoginComponent', () => {
     component.login();
 
     expect(component.loading).toBe(false);
-    expect(component.errorMessage).toBe('Credenciales inválidas');
+    expect(component.errorMessage).toBe('Credenciales inválidas.');
   });
 });
